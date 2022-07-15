@@ -1,12 +1,12 @@
 # Hydrogen-Atom
 In one dimension, the time-independent Schrödinger equation is given by
 
-$
+$$
 \large
 \begin{align}
 \mathbf{H}\ \mathbf{\Psi} = E\ \mathbf{\Psi}
 \end{align}
-$,
+$$,
 
 where $\mathbf{H}$ is the Hamiltonian. Here, $E$ and $\mathbf{\Psi}$ are the eigenvectors and eigenvalues of $\mathbf{H}$, respectively. The Hamiltonian is expressed as
 
