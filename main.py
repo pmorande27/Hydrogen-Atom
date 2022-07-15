@@ -20,6 +20,7 @@ def plot_error():
     """
     Function used to create a plot of the Error in the energy as a function of N,
     """
+    rmax = 1.5
     N = [5*i for i in range(40,150)]
     Hs = [Hydrogen_Atom(n,rmax) for n in N]
     error = [H.get_error()[0] for H in Hs]
@@ -34,7 +35,7 @@ def get_minimum_N():
     Function used to get the minimum value of N that gives a precission of 5e-4 (0.05%) to both energy levels
     """
     N = 600
-    H = Hydrogen_Atom(N,rmax)
+    H = Hydrogen_Atom(N,rmax=1.5)
     er1 ,er2= H.get_error()
     while er1> 5e-4 or  er2 > 5e-4:
         N = N+1
@@ -46,7 +47,7 @@ def energy_dif_vs_alpha_plot(N=1024):
     to be 1024. The range of values of alpha is not specified so it is taken to be (0,0.99) inclusive.
     """
     alpha_linspace = np.linspace(0,0.99,50)
-    Hms = [Hydrogen_Atom_M(N,alpha) for alpha in alpha_linspace]
+    Hms = [Hydrogen_Atom_M(N,alpha,rmax=1.5) for alpha in alpha_linspace]
     diffs = [Hm.get_energy_difference_super_modified() for Hm in Hms]
     alpha = [0,0.01]
     plt.plot(alpha_linspace,diffs)
@@ -60,9 +61,10 @@ def plot_my_v(N=1024):
     N will give the number of points and it will explore the values between rmax/N and rmax (by choice as it is not specified)
     as they are relevant for the following sections.
     """
+    rmax = 1.5
     r = np.linspace(rmax/N, rmax, N)
     alpha = 0.01
-    Hm = Hydrogen_Atom_M(N,alpha)
+    Hm = Hydrogen_Atom_M(N,alpha,rmax=1.5)
     v_my = [Hm.potential_numerical(x) for x in r]
     plt.plot(r,v_my)
     plt.xlabel('r[nm]')
@@ -78,7 +80,7 @@ def plot_lambda_error():
     N = 1024
     alphas = np.linspace(0,0.01,100)
     lambda_r = 121.5
-    Hms = [Hydrogen_Atom_M(N,alpha) for alpha in alphas]
+    Hms = [Hydrogen_Atom_M(N,alpha,rmax=1.5) for alpha in alphas]
     error = [abs(hc/Hm.get_energy_difference_super_modified() - lambda_r) for Hm  in Hms]
     plt.plot(alphas,error)
     plt.xlabel("α")
@@ -94,7 +96,7 @@ def get_lambda(alpha,epsilon,N):
     another root close to the first one but more leaning towards an error smaller than 0.1
     """
     lambda_r = 121.5
-    Hm = Hydrogen_Atom_M(N,alpha)
+    Hm = Hydrogen_Atom_M(N,alpha,rmax=1.5)
     delta_e = Hm.get_energy_difference_super_modified()
     lambda_ = hc/delta_e
     return abs(lambda_-lambda_r)-0.1+epsilon
@@ -110,7 +112,7 @@ def find_alpha_max(N = 1024):
     step = 10e-8    
     alpha = scipy.optimize.brentq(lambda x: get_lambda(x,epsilon,N),0.001,0.002,xtol=2e-13)
     while True:
-        Hm = Hydrogen_Atom_M(N,alpha)
+        Hm = Hydrogen_Atom_M(N,alpha,rmax=1.5)
         delta_e = Hm.get_energy_difference_super_modified()
         lambda_r = 121.5
         lambda_ = hc/delta_e
@@ -145,6 +147,11 @@ def plot_N_dependence():
 #print (f"alpha_max = {amax}.")
 
 def main():
+    #energy_dif_vs_alpha_plot()
+    #plot_my_v(100)
+    #alpha_max = find_alpha_max()
+    #print(alpha_max)
+    #plot_N_dependence()
     '''
     N = 636
     H = Hydrogen_Atom(N)
@@ -162,6 +169,7 @@ def main():
     print (f"{Err1 = }, {Err2 = }")
     assert Err1 < 5e-4
     assert Err2 < 5e-4
+    '''
     '''
     r = 1000 # nm
     N = 100000
@@ -185,5 +193,7 @@ def main():
     print (f"Err1 = {er1}, Err2 = {er2}.")
     plt.plot(vals,'o')
     plt.show()
+    '''
+   
 
 main()
