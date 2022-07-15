@@ -9,6 +9,13 @@ from scipy import integrate
 from scipy import optimize
 from Hydrogen_Atom import Hydrogen_Atom
 from Modified_Hydrogen_Atom import Hydrogen_Atom_M
+c1 = 0.0380998 # nm^2 eV
+c2 = 1.43996 # nm eV
+r0 = 0.0529177 # nm
+h  = 6.62606896e-34 # J s
+c  = 299792458. # m/s
+hc = 1239.8419 # eV nm
+rmax = 1.5 # nm
 def plot_error():
     """
     Function used to create a plot of the Error in the energy as a function of N,
@@ -39,7 +46,8 @@ def energy_dif_vs_alpha_plot(N=1024):
     to be 1024. The range of values of alpha is not specified so it is taken to be (0,0.99) inclusive.
     """
     alpha_linspace = np.linspace(0,0.99,50)
-    diffs = [get_energy_difference_super_modified(N,x) for x in alpha_linspace]
+    Hms = [Hydrogen_Atom_M(N,alpha) for alpha in alpha_linspace]
+    diffs = [Hm.get_energy_difference_super_modified() for Hm in Hms]
     alpha = [0,0.01]
     plt.plot(alpha_linspace,diffs)
     plt.xlabel('α')

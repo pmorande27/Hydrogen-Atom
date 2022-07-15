@@ -46,8 +46,8 @@ class Hydrogen_Atom_M(object):
         """
         r_space = np.linspace(rmax/self.N,rmax,self.N)
         diagonals =  np.zeros(self.N)
-        for i in range(N):
-            diagonals[i] = potential_numerical(r_space[i],self.alpha)
+        for i in range(self.N):
+            diagonals[i] = self.potential_numerical(r_space[i],self.alpha)
         diagonals = [diagonals]
         potential_matrix = diags(diagonals, [0])
         return potential_matrix
@@ -84,7 +84,7 @@ class Hydrogen_Atom_M(object):
         diagonal_off = -c1/np.power(h,2)*np.ones(self.N-1)
         r_space = np.linspace(rmax/self.N,rmax,self.N)
         diagonal_potential =  np.zeros(self.N)
-        for i in range(N):
+        for i in range(self.N):
             diagonal_potential[i] =self.potential_numerical(r_space[i])
         diagonal_main =  2*c1/np.power(h,2)*np.ones(self.N)+diagonal_potential
         #print(diagonal_off)
