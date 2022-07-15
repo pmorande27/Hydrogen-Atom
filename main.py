@@ -1,3 +1,12 @@
+from matplotlib import pyplot as plt
+import numpy as np
+import time
+import scipy.interpolate
+from scipy.sparse import linalg as splinalg
+from scipy import linalg
+from scipy.sparse import diags
+from scipy import integrate
+from scipy import optimize
 from Hydrogen_Atom import Hydrogen_Atom
 from Modified_Hydrogen_Atom import Hydrogen_Atom_M
 def plot_error():
