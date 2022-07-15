@@ -13,11 +13,11 @@ r0 = 0.0529177 # nm
 h  = 6.62606896e-34 # J s
 c  = 299792458. # m/s
 hc = 1239.8419 # eV nm
-rmax = 1.5 # nm
 class Hydrogen_Atom_M(object):
-    def __init__(self,N,alpha) -> None:
+    def __init__(self,N,alpha,rmax) -> None:
         self.N = N
         self.alpha = alpha
+        self.rmax = rmax
 
     def potential_numerical(self,r):
         """
@@ -34,7 +34,7 @@ class Hydrogen_Atom_M(object):
         the range of values of x explored will be spaced by rmax/N (tridiagonal matrix), it will return the laplacian
         multiplied by -c1 so that the construction of the hamiltonian is easier
         """
-        h = rmax/self.N
+        h = self.rmax/self.N
         laplacian = diags([-c1/np.power(h,2), 2*c1/np.power(h,2), -c1/np.power(h,2)], [-1, 0, 1], shape=(self.N, self.N))
         return(laplacian)
 
@@ -44,19 +44,19 @@ class Hydrogen_Atom_M(object):
         """
         Used to get the matrix representation (N x N) of the new modified operator, it depends on alpha
         """
-        r_space = np.linspace(rmax/self.N,rmax,self.N)
+        r_space = np.linspace(self.rmax/self.N,self.rmax,self.N)
         diagonals =  np.zeros(self.N)
         for i in range(self.N):
             diagonals[i] = self.potential_numerical(r_space[i],self.alpha)
         diagonals = [diagonals]
         potential_matrix = diags(diagonals, [0])
         return potential_matrix
-    def calculate_energy_levels(self):
+    def calculate_energy_levels(self,number_of_levels):
         """
         Used to calculate the new energy levels (the first two eigenvalues)
         """
         hamitltonian_operator= self.laplacian_operator()+self.potential_operator_modified()
-        vals, vecs = splinalg.eigsh(hamitltonian_operator, k=2,which= 'SA')
+        vals, vecs = splinalg.eigsh(hamitltonian_operator, k=number_of_levels,which= 'SA')
         return vals
     '''
     N = 1024
@@ -74,22 +74,22 @@ class Hydrogen_Atom_M(object):
         """
         E1, E2 = self.calculate_energy_levels()
         return (E2-E1)
-    def energy_levels_modified_super(self):
+    def energy_levels_modified_super(self,number_of_levels):
         """
         Used to calculate the new energy levels (the first two eigenvalues) but faster using the result of task 5
         it will use the advantage that H is tridiagonal and Hermitian to speed things up
         """
-        h = np.divide(rmax,self.N)
+        h = np.divide(self.rmax,self.N)
         laplacian = diags([-c1/np.power(h,2), 2*c1/np.power(h,2), -c1/np.power(h,2)], [-1, 0, 1], shape=(self.N, self.N))
         diagonal_off = -c1/np.power(h,2)*np.ones(self.N-1)
-        r_space = np.linspace(rmax/self.N,rmax,self.N)
+        r_space = np.linspace(self.rmax/self.N,self.rmax,self.N)
         diagonal_potential =  np.zeros(self.N)
         for i in range(self.N):
             diagonal_potential[i] =self.potential_numerical(r_space[i])
         diagonal_main =  2*c1/np.power(h,2)*np.ones(self.N)+diagonal_potential
         #print(diagonal_off)
         #print(diagonal_main)
-        val_one, val_two = linalg.eigvalsh_tridiagonal(diagonal_main,diagonal_off,select='i',select_range=(0,1))
+        val_one, val_two = linalg.eigvalsh_tridiagonal(diagonal_main,diagonal_off,select='i',select_range=(0,number_of_levels-1))
         return val_one,val_two
     '''
     N = 1204
@@ -105,5 +105,5 @@ class Hydrogen_Atom_M(object):
         """
         Gets the difference in energy of the two obtained levels using the new hamiltonian and using the fastest method
         """
-        E1, E2 = self.energy_levels_modified_super()
+        E1, E2 = self.energy_levels_modified_super(2)
         return (E2-E1)
