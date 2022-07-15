@@ -163,18 +163,27 @@ def main():
     assert Err1 < 5e-4
     assert Err2 < 5e-4
     '''
-    r = 100 # nm
-    N = 1000000
+    r = 1000 # nm
+    N = 100000
+    number = 10
     H = Hydrogen_Atom(N,r)
     t1 = time.time()
-    my_e1, my_e2 = H.calculate_energy_levels_super()
+    vals = H.calculate_energy_levels_super(number)
+    my_e1 = vals[0]
+    my_e2 = vals[1]
+    #print(vals)
     t2 = time.time()
     print (f"Calculation took {t2-t1} seconds.")
-
+    theo = [-c2/(2*r0*n**2) for n in range(1,101)]
+    error = [abs((x-y)/x) for (x,y) in zip(theo,vals)]
+    print(error)
     e1_th = -c2 / (2 * r0)
     e2_th = e1_th / 4
 
     er1 = abs((my_e1 - e1_th) / e1_th)
     er2 = abs((my_e2 - e2_th) / e2_th)
     print (f"Err1 = {er1}, Err2 = {er2}.")
+    plt.plot(vals,'o')
+    plt.show()
+
 main()
