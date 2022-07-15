@@ -15,13 +15,13 @@ r0 = 0.0529177 # nm
 h  = 6.62606896e-34 # J s
 c  = 299792458. # m/s
 hc = 1239.8419 # eV nm
-rmax = 1.5 # nm
+rmax = 10 # nm
 def plot_error():
     """
     Function used to create a plot of the Error in the energy as a function of N,
     """
     N = [5*i for i in range(40,150)]
-    Hs = [Hydrogen_Atom(n) for n in N]
+    Hs = [Hydrogen_Atom(n,rmax) for n in N]
     error = [H.get_error()[0] for H in Hs]
     plt.plot(N,error)
     plt.xlabel("N")
@@ -34,7 +34,7 @@ def get_minimum_N():
     Function used to get the minimum value of N that gives a precission of 5e-4 (0.05%) to both energy levels
     """
     N = 600
-    H = Hydrogen_Atom(N)
+    H = Hydrogen_Atom(N,rmax)
     er1 ,er2= H.get_error()
     while er1> 5e-4 or  er2 > 5e-4:
         N = N+1
@@ -145,5 +145,36 @@ def plot_N_dependence():
 #print (f"alpha_max = {amax}.")
 
 def main():
+    '''
+    N = 636
+    H = Hydrogen_Atom(N)
+    er1 ,er2= H.get_error()
+    print (f"Err1 = {er1}, Err2 = {er2}.")
+    assert er1 < 5e-4
+    assert er1 < 5e-4
+    print(H.get_energy_levels()) 
+    N = 1204
+    Hm = Hydrogen_Atom_M(N,alpha=0.01)
+    E1, E2 = Hm.energy_levels_modified_super()
+    E1_th, E2_th = -13.807387841665346, -3.5346025272551795
+    Err1 = abs((E1 - E1_th) / E1_th)
+    Err2 = abs((E2 - E2_th) / E2_th)
+    print (f"{Err1 = }, {Err2 = }")
+    assert Err1 < 5e-4
+    assert Err2 < 5e-4
+    '''
+    r = 100 # nm
+    N = 1000000
+    H = Hydrogen_Atom(N,r)
+    t1 = time.time()
+    my_e1, my_e2 = H.calculate_energy_levels_super()
+    t2 = time.time()
+    print (f"Calculation took {t2-t1} seconds.")
 
-   pass 
+    e1_th = -c2 / (2 * r0)
+    e2_th = e1_th / 4
+
+    er1 = abs((my_e1 - e1_th) / e1_th)
+    er2 = abs((my_e2 - e2_th) / e2_th)
+    print (f"Err1 = {er1}, Err2 = {er2}.")
+main()

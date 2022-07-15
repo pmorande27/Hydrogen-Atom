@@ -16,9 +16,9 @@ r0 = 0.0529177 # nm
 h  = 6.62606896e-34 # J s
 c  = 299792458. # m/s
 hc = 1239.8419 # eV nm
-rmax = 1.5 # nm
 class Hydrogen_Atom(object):
-    def __init__(self,N) -> None:
+    def __init__(self,N,rmax) -> None:
+        self.rmax = rmax
         self.N = N
     def laplacian_operator(self):
         """
@@ -26,7 +26,7 @@ class Hydrogen_Atom(object):
         the range of values of x explored will be spaced by rmax/N (tridiagonal matrix), it will return the laplacian
         multiplied by -c1 so that the construction of the hamiltonian is easier
         """
-        h = rmax/self.N
+        h = self.rmax/self.N
         laplacian = diags([-c1/np.power(h,2), 2*c1/np.power(h,2), -c1/np.power(h,2)], [-1, 0, 1], shape=(self.N, self.N))
         return(laplacian)
     def potential_operator(self):
@@ -35,7 +35,7 @@ class Hydrogen_Atom(object):
         it will be a diagonal matrix.
         """
         
-        r_space = np.linspace(rmax/self.N,rmax,self.N)
+        r_space = np.linspace(self.rmax/self.N,self.rmax,self.N)
         diagonals = [-c2/r_space]
         potential_matrix = diags(diagonals, [0])
         
@@ -51,7 +51,8 @@ class Hydrogen_Atom(object):
         """
         Function used to get the first two eigenvalues of the hamiltonian which correspond to the Energy levels of the system.
         """
-        vals, vecs = splinalg.eigsh(self.hamiltonian_operator(), k=2,which= 'SA')
+        vals, vecs = splinalg.eigsh(self.hamiltonian_operator(), k=10,which= 'SA')
+        print(vals)
         return vals[0].real,vals[1].real
 
     def get_error(self):
@@ -70,13 +71,16 @@ class Hydrogen_Atom(object):
         hermitian
         """
         t1 = time.time()
-        h = np.divide(rmax,self.N)
+        h = np.divide(self.rmax,self.N)
         laplacian = diags([-c1/np.power(h,2), 2*c1/np.power(h,2), -c1/np.power(h,2)], [-1, 0, 1], shape=(self.N, self.N))
         diagonal_off = -c1/np.power(h,2)*np.ones(self.N-1)
-        r_space = np.linspace(rmax/self.N,rmax,self.N)
+        r_space = np.linspace(self.rmax/self.N,self.rmax,self.N)
         diagonal_potential = -c2/r_space
         diagonal_main =  2*c1/np.power(h,2)*np.ones(self.N)+diagonal_potential
         val_one, val_two = linalg.eigvalsh_tridiagonal(diagonal_main,diagonal_off,select='i',select_range=(0,1))
+        vals  = linalg.eigvalsh_tridiagonal(diagonal_main,diagonal_off,select='i',select_range=(0,10))
+        print(vals)
+
         return val_one,val_two
 
 '''
