@@ -36,7 +36,22 @@ def energy_dif_vs_alpha_plot(N=1024):
     plt.xlabel('α')
     plt.ylabel('ΔE[eV]')
     plt.show()
-#energy_dif_vs_alpha_plot()    
+#energy_dif_vs_alpha_plot()  
+def plot_my_v(N=1024):
+    """
+    Function used to create a plot of the new modified potential with alpha = 0.01.
+    N will give the number of points and it will explore the values between rmax/N and rmax (by choice as it is not specified)
+    as they are relevant for the following sections.
+    """
+    r = np.linspace(rmax/N, rmax, N)
+    alpha = 0.01
+    v_my = [potential_numerical(x,alpha)for x in r]
+    plt.plot(r,v_my)
+    plt.xlabel('r[nm]')
+    plt.ylabel('V[eV]')
+    plt.show()  
+#plot_my_v(100)
+
 def plot_lambda_error():
     """
     Function used to get a plot of how the error in lambda (the difference between calculated and expected values) evolves
