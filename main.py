@@ -1,5 +1,5 @@
-from sympy import im
 from Hydrogen_Atom import Hydrogen_Atom
+from Modified_Hydrogen_Atom import Hydrogen_Atom_M
 def plot_error():
     """
     Function used to create a plot of the Error in the energy as a function of N,
@@ -45,7 +45,8 @@ def plot_my_v(N=1024):
     """
     r = np.linspace(rmax/N, rmax, N)
     alpha = 0.01
-    v_my = [potential_numerical(x,alpha)for x in r]
+    Hm = Hydrogen_Atom_M(N,alpha)
+    v_my = [Hm.potential_numerical(x) for x in r]
     plt.plot(r,v_my)
     plt.xlabel('r[nm]')
     plt.ylabel('V[eV]')
@@ -60,7 +61,8 @@ def plot_lambda_error():
     N = 1024
     alphas = np.linspace(0,0.01,100)
     lambda_r = 121.5
-    error = [abs(hc/get_energy_difference_super_modified(N,alpha) - lambda_r) for alpha in alphas]
+    Hms = [Hydrogen_Atom_M(N,alpha) for alpha in alphas]
+    error = [abs(hc/Hm.get_energy_difference_super_modified() - lambda_r) for Hm  in Hms]
     plt.plot(alphas,error)
     plt.xlabel("α")
     plt.ylabel("error[nm]")
@@ -75,7 +77,8 @@ def get_lambda(alpha,epsilon,N):
     another root close to the first one but more leaning towards an error smaller than 0.1
     """
     lambda_r = 121.5
-    delta_e = get_energy_difference_super_modified(N,alpha)
+    Hm = Hydrogen_Atom_M(N,alpha)
+    delta_e = Hm.get_energy_difference_super_modified()
     lambda_ = hc/delta_e
     return abs(lambda_-lambda_r)-0.1+epsilon
 def find_alpha_max(N = 1024):
@@ -90,7 +93,8 @@ def find_alpha_max(N = 1024):
     step = 10e-8    
     alpha = scipy.optimize.brentq(lambda x: get_lambda(x,epsilon,N),0.001,0.002,xtol=2e-13)
     while True:
-        delta_e = get_energy_difference_super_modified(N,alpha)
+        Hm = Hydrogen_Atom_M(N,alpha)
+        delta_e = Hm.get_energy_difference_super_modified()
         lambda_r = 121.5
         lambda_ = hc/delta_e
         error = abs(lambda_-lambda_r)
